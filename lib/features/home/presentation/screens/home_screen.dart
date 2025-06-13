@@ -168,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ammanClinicsError = '';
     });
     try {
-      final clinics = await ApiService.getNearbyClinics('amman');
-      print(clinics);
+      final userAddress = await UserService.getUserAddress();
+      final clinics = await ApiService.getNearbyClinics(userAddress?? "");
       setState(() {
         ammanClinics = clinics;
         isLoadingAmmanClinics = false;

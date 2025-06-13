@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:petscare/api/user_service.dart';
 import 'package:petscare/core/presentation/widgets/custom_button.dart';
 import 'package:petscare/features/auth/presentation/screens/account_type_screen.dart';
-import 'package:petscare/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:petscare/features/profile/presentation/screens/edit_profile_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -15,6 +18,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   String userName = '';
   String userEmail = '';
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -33,11 +37,19 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List elements = [
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final List<Map<String, dynamic>> elements = [
       {
         "icon": "assets/icons/user-outline.svg",
         "title": "Edit Profile",
-        "onTap": () {},
+        "onTap": () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+          );
+        },
       },
       {
         "icon": "assets/icons/language.svg",
@@ -45,22 +57,11 @@ class _AccountScreenState extends State<AccountScreen> {
         "onTap": () {},
       },
       {
-        "icon": "assets/icons/paw-outline.svg",
-        "title": "My Pets",
-        "onTap": () {},
-      },
-      {
-        "icon": "assets/icons/book.svg",
-        "title": "Learning Space",
-        "onTap": () {},
-      },
-      {
         "icon": "assets/icons/logout.svg",
-        "title": "Logout",
+        "title": "Sign out",
         "onTap": () async {
           try {
             await UserService.logout();
-            print("logout is =+============================");
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -69,109 +70,124 @@ class _AccountScreenState extends State<AccountScreen> {
             );
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Logout failed: ${e.toString()}')),
+              SnackBar(content: Text('Logout failed: ${e.toString()}')),
             );
           }
-        }
+        },
       },
     ];
 
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return SafeArea(
-        child: Scaffold(
-      backgroundColor: Color(0xffF6F6F6),
-      body: Stack(
-        children: [
-          Positioned(
-            left: 207,
-            top: -342,
-            child: Container(
-              width: 399,
-              height: 432,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(360),
+      child: Scaffold(
+        backgroundColor: const Color(0xffF6F6F6),
+        body: Stack(
+          children: [
+            Positioned(
+              left: screenWidth * 0.52,
+              top: -screenHeight * 0.38,
+              child: Container(
+                width: screenWidth * 0.7,
+                height: screenWidth * 0.75,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.9),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xffBAD7DF).withOpacity(0.3),
+                      color: const Color(0xffBAD7DF).withOpacity(0.3),
                       blurRadius: 300,
                     ),
-                  ]),
-            ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(right: 25, left: 25, bottom: 25, top: 25),
-            child: SizedBox(
-              height: screenHeight - screenHeight * 0.1809,
-              child: Column(
-                children: [
-                  // START ACCOUNT DETELS
-                  Container(
-                    width: screenWidth * 0.2503,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(180),
-                        color: Color(0xffD9DEDF)),
-                    child: Center(
-                      child: Stack(
-                        children: [
-                          Icon(
-                            Icons.person,
-                            size: screenWidth * 0.2430,
-                            color: Colors.white,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child:
-                                SvgPicture.asset("assets/icons/cameraAdd.svg"),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.0224),
-                  Text(
-                    "$userName",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontFamily: "poppins2",
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.50,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.0044),
-                  Text(
-                    "$userEmail",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color(0xFF222222),
-                      fontSize: 14,
-                      fontFamily: "poppins1",
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 1.12,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.0505),
-                  // END ACCOUNT DETELS
-                  // ###### - - - - - - #####
-                  // START MY LIST GENERATE FOR MY BUTTONS
-                  ...List.generate(elements.length, (index) {
-                    return CustomButton(
-                      icon: elements[index]["icon"],
-                      title: elements[index]["title"],
-                      onTap: elements[index]["onTap"],
-                    );
-                  }),
-                  // END MY LIST GENERATE FOR MY BUTTONS
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.all(screenWidth * 0.06),
+              child: SizedBox(
+                height: screenHeight - screenHeight * 0.1809,
+                child: Column(
+                  children: [
+                    // Profile image
+                    Container(
+                      width: screenWidth * 0.2503,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(180),
+                        color: const Color(0xffD9DEDF),
+                      ),
+                      child: Center(
+                        child: Stack(
+                          children: [
+                            _selectedImage != null
+                                ? ClipOval(
+                                    child: Image.file(
+                                      _selectedImage!,
+                                      width: screenWidth * 0.243,
+                                      height: screenWidth * 0.243,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: screenWidth * 0.243,
+                                    color: Colors.white,
+                                  ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: SvgPicture.asset(
+                                  "assets/icons/cameraAdd.svg",
+                                  width: screenWidth * 0.09,
+                                  height: screenWidth * 0.09,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.0224),
+
+                    // User name
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: screenWidth * 0.045,
+                        fontFamily: "poppins2",
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.0044),
+
+                    // User email
+                    Text(
+                      userEmail,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color(0xFF222222),
+                        fontSize: screenWidth * 0.035,
+                        fontFamily: "poppins1",
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 1.12,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.0505),
+
+                    // Buttons
+                    ...elements.map((item) {
+                      return CustomButton(
+                        icon: item["icon"],
+                        title: item["title"],
+                        onTap: item["onTap"],
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
