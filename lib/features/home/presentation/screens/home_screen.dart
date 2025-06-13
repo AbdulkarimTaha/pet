@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:petscare/api/user_service.dart';
 import 'dart:async';
 import 'package:petscare/api/api_service.dart';
+import 'package:petscare/features/profile/presentation/screens/ai_chat_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /////////////////////main
 List<Map<String, dynamic>> searchResults = [];
@@ -541,6 +543,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .toList(),
                                       ),
                   ],
+                ),
+              ),
+            ),
+            // Add AI Chatbot floating button
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AIChatScreen()),
+                  );
+                },
+                borderRadius: BorderRadius.circular(28), // Half of width/height
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF99DDCC),
+                    shape: BoxShape.circle, // Makes it circular
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/message-chatbot.svg',
+                      width: 27,
+                      height: 27,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
             ),
